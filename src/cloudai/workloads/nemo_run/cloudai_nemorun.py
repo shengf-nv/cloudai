@@ -46,13 +46,25 @@ from nemo.collections.llm.recipes.tp_overlap_configs.userbuffers import (
 )
 from nemo.collections.nlp.modules.common.tokenizer_utils import get_nmt_tokenizer
 from nemo.lightning import AutoResume, NeMoLogger
+from nemo.lightning.pytorch.callbacks.deepep import DeepEPCallback
 from nemo.lightning.pytorch.callbacks.flops_callback import FLOPsMeasurementCallback
 from nemo.lightning.pytorch.callbacks.garbage_collection import GarbageCollectionCallback
 from nemo.lightning.pytorch.callbacks.megatron_comm_overlap import MegatronCommOverlapCallback
 from nemo.lightning.pytorch.callbacks.moe_token_drop import MegatronTokenDropCallback
 from nemo.lightning.pytorch.callbacks.nsys import NsysCallback
+from nemo.lightning.pytorch.callbacks.pytorch_profiler import PytorchProfilerCallback
 from nemo.lightning.pytorch.optim import CosineAnnealingScheduler
 from nemo.utils.exp_manager import TimingCallback
+
+
+def set_deepep_params(recipe):
+    enable_deepep = os.getenv("CLOUDAI_ENABLE_DEEPEP", "0") == "1"
+    if enable_deepep:
+        print("INFO: CLOUDAI_ENABLE_DEEPEP is set. Applying DeepEP model configs.")
+        recipe.trainer.callbacks.append(run.Config(DeepEPCallback))
+        recipe.trainer.callbacks[-1].moe_expert_capacity_factor = -1.0
+        recipe.trainer.callbacks[-1].moe_pad_expert_input_to_capacity = False
+        recipe.model.config.moe_router_dtype = "fp32"
 
 
 def set_enable_cuda_graphs_params(recipe):
@@ -190,6 +202,47 @@ def nsys_callbacks() -> list[pl.Callback]:
         ),
     ]
 
+
+@run.cli.factory
+@run.autoconvert
+def pytorch_profiler_callbacks() -> list[pl.Callback]:
+    start_step   = 3
+    end_step     = 4
+    warmup_steps = 0
+    trace_dir    = "/cloudai_run_results"
+    collect_et   = False
+    return [
+        timing_callback(),
+        run.Config(
+            PytorchProfilerCallback,
+            start_step   = start_step,
+            end_step     = end_step,
+            warmup_steps = warmup_steps,
+            trace_dir    = trace_dir,
+            collect_et   = collect_et,
+            profiler_kwargs = {"with_stack": True},
+        ),
+    ]
+
+# @run.cli.factory
+# @run.autoconvert
+# def pytorch_profiler_callbacks() -> list[pl.Callback]:
+#     start_step   = 3
+#     end_step     = 4
+#     warmup_steps = 0
+#     active_steps = 1
+#     trace_dir="/cloudai_run_results"
+#     return [
+#         timing_callback(),
+#         run.Config(
+#             PytorchProfilerCallback,
+#             start_step   = start_step,
+#             end_step     = end_step,
+#             warmup_steps = warmup_steps,
+#             active_steps = active_steps,
+#             trace_dir    = trace_dir,
+#         ),
+#     ]
 
 @run.cli.factory
 @run.autoconvert
@@ -658,6 +711,8 @@ def cloudai_llama4_scout_recipe() -> run.Partial:
 
     # Check if enabling cuda graphs
     set_enable_cuda_graphs_params(recipe)
+    # Check if enabling DeepEP
+    set_deepep_params(recipe)
 
     return recipe
 
@@ -683,6 +738,8 @@ def cloudai_llama4_maverick_recipe() -> run.Partial:
 
     # Check if enabling cuda graphs
     set_enable_cuda_graphs_params(recipe)
+    # Check if enabling DeepEP
+    set_deepep_params(recipe)
 
     return recipe
 
@@ -712,6 +769,7 @@ def cloudai_llama3_8b_recipe() -> run.Partial:
 # LLAMA3 70B Recipe
 @run.cli.factory(target=llm.pretrain)
 def cloudai_llama3_70b_recipe() -> run.Partial:
+    print("SHENG-DEBUG in cloudai_llama3_70b_recipe", flush=True)
     recipe = run.Partial(
         llm.pretrain,
         model=run.Config(LlamaModel, config=Llama3Config70B()),
@@ -1304,6 +1362,8 @@ def cloudai_qwen3_30b_a3b_recipe() -> run.Partial:
 
 
 if __name__ == "__main__":
+    print("SHENG-DEBUG in cloudai_nemo.py", flush=True)
+
     mode = os.getenv("CLOUDAI_NEMO_TASK")
 
     supported_recipes = [
@@ -1328,6 +1388,7 @@ if __name__ == "__main__":
                 "Advanced CLI features that use ForwardRefs are not supported using in Nemo-Run CLI yet."
             )
         )
+    print("SHENG-DEBUG cloudai_nemorun", flush=True)
     if mode == "pretrain":
         run.cli.main(fn=llm.pretrain)
     elif mode == "finetune":
