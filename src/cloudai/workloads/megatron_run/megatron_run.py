@@ -43,10 +43,10 @@ class MegatronRunCmdArgs(CmdArgs):
 
     global_batch_size: Optional[int] = 16
     hidden_size: Optional[int] = 4096
-    hybrid_layer_pattern: Optional[str] = None
+    hybrid_layer_pattern: Optional[str | list[str]] = None
     max_position_embeddings: Optional[int] = 4096
     num_attention_heads: Optional[int] = 32
-    num_layers: Optional[int] = 32
+    num_layers: Optional[int | list[int]] = 32
     pipeline_model_parallel_size: Optional[int] = 1
     recompute_activations: Optional[str] = None
     seq_length: Optional[int] = 4096
