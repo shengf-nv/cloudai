@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import re
 from os.path import expandvars
 from pathlib import Path
@@ -22,7 +23,7 @@ from typing import Optional, Tuple, Union
 import toml
 from pydantic import Field, field_validator, model_validator
 
-from cloudai.core import DockerImage, Installable, JobStatusResult, TestRun
+from cloudai.core import DockerImage, Installable, JobStatusResult, System, TestRun
 from cloudai.models.workload import CmdArgs, TestDefinition
 from cloudai.systems.slurm import SlurmJobMetadata
 
@@ -42,6 +43,7 @@ class MegatronRunCmdArgs(CmdArgs):
 
     global_batch_size: Optional[int] = 16
     hidden_size: Optional[int] = 4096
+    hybrid_layer_pattern: Optional[str] = None
     max_position_embeddings: Optional[int] = 4096
     num_attention_heads: Optional[int] = 32
     num_layers: Optional[int] = 32
@@ -104,6 +106,23 @@ class MegatronRunTestDefinition(TestDefinition):
     @property
     def installables(self) -> list[Installable]:
         return [self.docker_image, *self.git_repos]
+
+    def constraint_check(self, tr: TestRun, system: Optional[System]) -> bool:
+        """Check that the hybrid layer pattern defines every model layer."""
+        pattern = self.cmd_args.hybrid_layer_pattern
+        if pattern is None:
+            return True
+
+        num_layers = self.cmd_args.num_layers
+        constraint = num_layers is not None and num_layers == len(pattern)
+        if not constraint:
+            logging.error(
+                "MegatronRun constraint failed: num_layers must equal len(hybrid_layer_pattern). "
+                "Values: num_layers=%s, len(hybrid_layer_pattern)=%s",
+                num_layers,
+                len(pattern),
+            )
+        return constraint
 
     @model_validator(mode="after")
     def load_path_specified(self):

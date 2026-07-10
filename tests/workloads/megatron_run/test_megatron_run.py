@@ -85,3 +85,35 @@ class TestMegatronRunSuccessCheck:
 
         result = self.megatron_tdef.was_run_successful(base_tr)
         assert result.is_successful is is_successful
+
+
+class TestMegatronRunConstraintCheck:
+    @pytest.mark.parametrize(
+        ("num_layers", "hybrid_layer_pattern", "expected"),
+        (
+            (4, None, True),
+            (4, "MMTM", True),
+            (3, "MMTM", False),
+            (None, "MMTM", False),
+        ),
+    )
+    def test_hybrid_layer_pattern_matches_num_layers(
+        self,
+        base_tr: TestRun,
+        num_layers: int | None,
+        hybrid_layer_pattern: str | None,
+        expected: bool,
+    ) -> None:
+        test_definition = MegatronRunTestDefinition(
+            name="m",
+            description="d",
+            test_template_name="MegatronRun",
+            cmd_args=MegatronRunCmdArgs(
+                docker_image_url="http://url",
+                run_script=Path(__file__),
+                num_layers=num_layers,
+                hybrid_layer_pattern=hybrid_layer_pattern,
+            ),
+        )
+
+        assert test_definition.constraint_check(base_tr, None) is expected
