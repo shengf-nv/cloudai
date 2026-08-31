@@ -1,0 +1,185 @@
+name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
+description = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
+test_template_name = "MegatronRun"
+
+[cmd_args]
+docker_image_url = "/mnt/lustre/users/shengf/deepseek/nemotron-container/pytorch-qwen_26.08-py3.sqsh"
+run_script = "/megatron/pretrain_gpt.py"
+
+# Distributed args
+distributed_timeout_minutes = 220
+tensor_model_parallel_size = 4
+# pipeline_model_parallel_size = 1
+# num_layers_per_virtual_pipeline_stage = 1
+expert_model_parallel_size = 4
+context_parallel_size = 1
+expert_tensor_parallel_size = 1
+use_distributed_optimizer = "true"
+grad_reduce_in_bf16 = "true"
+use_megatron_fsdp = "true"
+data_parallel_sharding_strategy = "optim_grads_params"
+overlap_grad_reduce = "true"
+overlap_param_gather = "true"
+fsdp_double_buffer = "true"
+# TODO
+use_nccl_ub = "false"
+create_all_gather_group = "true"
+no_gradient_accumulation_fusion = "true"
+account_for_embedding_in_pipeline_split = "true"
+account_for_loss_in_pipeline_split = "true"
+cross_entropy_loss_fusion = "true"
+cross_entropy_fusion_impl = "native"
+enable_experimental = "true"
+ddp_reduce_scatter_with_fp32_accumulation = "false"
+
+# Training args
+use_mcore_models = "true"
+sequence_parallel = "true"
+use_flash_attn = "true"
+disable_bias_linear = "true"
+micro_batch_size = 1
+global_batch_size = 64
+train_samples = 81920
+exit_duration_in_mins = 230
+# recompute_granularity = "selective"
+# recompute_modules = "moe_act layernorm"
+manual_gc = "true"
+manual_gc_interval = 5
+
+# Transformer Engine args
+transformer_impl = "transformer_engine"
+
+# Data args
+seq_length = 4096
+data_cache_path = "/cloudai_run_results/data_cache"
+#tokenizer_type = "HuggingFaceTokenizer"
+#tokenizer_model = "Qwen/Qwen3-235B-A22B"
+#data_path = "${DATA_PATH}"
+mock_data = "true"
+tiktoken_pattern = "v2"
+tokenizer_type = "TikTokenizer"
+tokenizer_model = "/cloudai_install/multiMixV8.gpt4o_nc_sd.500000.128k.vocab.json"
+
+split = "99,1,0"
+no_mmap_bin_files = "true"
+no_create_attention_mask_in_dataloader = "true"
+num_workers = 6
+
+# Network size args
+num_layers = 94
+hidden_size = 4096
+ffn_hidden_size = 12288
+num_attention_heads = 64
+kv_channels = 128
+max_position_embeddings = 40960
+position_embedding_type = "rope"
+rotary_percent = 1.0
+rotary_base = 1000000
+rotary_seq_len_interpolation_factor = 1
+make_vocab_size_divisible_by = 1187
+normalization = "RMSNorm"
+norm_epsilon = 1e-6
+swiglu = "true"
+untie_embeddings_and_output_weights = "true"
+group_query_attention = "true"
+num_query_groups = 4
+
+# Regularization args
+attention_dropout = 0.0
+hidden_dropout = 0.0
+clip_grad = 1.0
+weight_decay = 0.1
+qk_layernorm = "true"
+
+# Learning rate args
+lr_decay_samples = 584765624
+lr_warmup_samples = 1536000
+lr_warmup_init = 3.9e-7
+lr = 3.9e-6
+min_lr = 3.9e-7
+lr_decay_style = "cosine"
+adam_beta1 = 0.9
+adam_beta2 = 0.95
+
+# MoE args
+num_experts = 128
+moe_ffn_hidden_size = 1536
+moe_router_load_balancing_type = "aux_loss"
+moe_router_force_load_balancing = "true"
+moe_router_topk = 8
+moe_grouped_gemm = "true"
+moe_aux_loss_coeff = 1e-3
+moe_token_dispatcher_type = "flex"
+
+moe_flex_dispatcher_backend = "hybridep"
+moe_permute_fusion = "true"
+moe_router_dtype = "fp32"
+moe_router_fusion = "true"
+# Add 1F1B overlapping 
+delay_wgrad_compute = "false"
+overlap_moe_expert_parallel_comm = "false"
+
+# Add validation args
+eval_iters = 10
+eval_interval = 10000
+
+# Checkpointing args
+finetune = "false"
+ckpt_format = "fsdp_dtensor"
+#load = "${LOAD_PATH}"
+no_load_rng = "false"
+no_load_optim = "false"
+#save = "${OUTPUT_PATH}/checkpoints"
+#save_interval = 100
+#dist_ckpt_strictness = "log_all"
+
+# Initialization args
+init_method_std = 0.02
+
+# Logging args
+log_timers_to_tensorboard = "true"
+log_memory_to_tensorboard = "true"
+log_num_zeros_in_grad = "true"
+log_params_norm = "true"
+log_validation_ppl_to_tensorboard = "true"
+log_throughput = "true"
+log_interval = 1
+logging_level = 40
+tensorboard_dir = "/cloudai_run_results/tensorboard"
+#wandb_project = "${WANDB_PROJECT}"
+#wandb_exp_name = "Qwen3-235B-A22B-TP${TP}PP${PP}EP${EP}CP${CP}VPP${VPP}-MBS${MBS}GBS${GBS}-${COMMENT}"
+
+# Mixed precision args
+bf16 = "true"
+
+# Profiling args
+profile = "false"
+profile_step_start = 8
+profile_step_end = 9
+use_pytorch_profiler = "true"
+pytorch_profiler_collect_chakra = "false"
+pytorch_profiler_collect_callstack = "false"
+
+[extra_env_vars]
+CUDA_DEVICE_MAX_CONNECTIONS = "32"
+NVTE_FWD_LAYERNORM_SM_MARGIN = "20"
+NVTE_BWD_LAYERNORM_SM_MARGIN = "20"
+TORCH_NCCL_AVOID_RECORD_STREAMS = "0"
+NVTE_ALLOW_NONDETERMINISTIC_ALGO = "1"
+NCCL_MNNVL_ENABLE = "1"
+NCCL_NVLS_ENABLE = "1"
+NCCL_NO_CACHE = "ALL"
+NVTE_FUSED_ATTN = "1"
+NVTE_NORM_FWD_USE_CUDNN = "1"
+NVTE_NORM_BWD_USE_CUDNN = "1"
+PYTHONWARNINGS = "ignore"
+
+# NCCL_DEBUG = "WARN"
+# NCCL_DEBUG_SUBSYS = "ALL"
+
+# SHARP_COLL_LOG_LEVEL = "0"
+# SHARP_COLL_SAT_LOCK_BATCH_SIZE = "1"
+# SHARP_COLL_LOCK_ON_COMM_INIT = "0"
+# SHARP_ROUNDING_METHOD = "0"
+
+
