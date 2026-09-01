@@ -21,8 +21,7 @@ data_parallel_sharding_strategy = "optim_grads_params"
 overlap_grad_reduce = "true"
 overlap_param_gather = "true"
 fsdp_double_buffer = "true"
-# TODO
-use_nccl_ub = "false"
+use_nccl_ub = "true"
 create_all_gather_group = "true"
 no_gradient_accumulation_fusion = "true"
 account_for_embedding_in_pipeline_split = "true"
@@ -174,8 +173,11 @@ NVTE_NORM_FWD_USE_CUDNN = "1"
 NVTE_NORM_BWD_USE_CUDNN = "1"
 PYTHONWARNINGS = "ignore"
 
-# NCCL_DEBUG = "WARN"
+# NCCL_DEBUG = "INFO"
 # NCCL_DEBUG_SUBSYS = "ALL"
+
+# work around for symmetric user buffer bug
+NCCL_GIN_GPUNETIO_PATH = "/opt/hpcx/nccl_spectrum-x_plugin/lib/libdoca_gpunetio_host.so.2"
 
 # SHARP_COLL_LOG_LEVEL = "0"
 # SHARP_COLL_SAT_LOCK_BATCH_SIZE = "1"
