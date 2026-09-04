@@ -2,6 +2,17 @@ name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 description = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 test_template_name = "MegatronRun"
 
+
+[[git_repos]]
+url = "git@github.com:shengf-nv/Megatron-LM.git"
+commit = "shengf/sharpv4"
+mount_as = "/megatron"
+
+[[git_repos]]
+url = "git@github.com:shengf-nv/gpt-tokenizer.git"
+commit = "main"
+mount_as = "/gpt-tokenizer"
+
 [cmd_args]
 docker_image_url = "/mnt/lustre/users/shengf/deepseek/nemotron-container/pytorch-qwen_26.09-py3.sqsh"
 run_script = "/megatron/pretrain_gpt.py"
@@ -57,7 +68,7 @@ data_cache_path = "/cloudai_run_results/data_cache"
 mock_data = "true"
 tiktoken_pattern = "v2"
 tokenizer_type = "TikTokenizer"
-tokenizer_model = "/cloudai_install/multiMixV8.gpt4o_nc_sd.500000.128k.vocab.json"
+tokenizer_model = "/gpt-tokenizer/multiMixV8.gpt4o_nc_sd.500000.128k.vocab.json"
 
 split = "99,1,0"
 no_mmap_bin_files = "true"

@@ -3,9 +3,5 @@ name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 [[Tests]]
 id = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 test_name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
-time_limit = "99:00:00"
+time_limit = "01:00:00"
 num_nodes = 16
-#nodes = ["gb-blyris-[21-28]"]
-extra_container_mounts = [
-  "/mnt/lustre/users/shengf/deepseek/cloudai/install/Megatron-LM:/megatron",
-]
