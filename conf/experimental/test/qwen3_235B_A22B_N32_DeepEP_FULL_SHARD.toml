@@ -3,7 +3,7 @@ description = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 test_template_name = "MegatronRun"
 
 [cmd_args]
-docker_image_url = "/mnt/lustre/users/shengf/deepseek/nemotron-container/pytorch-qwen_26.08-py3.sqsh"
+docker_image_url = "/mnt/lustre/users/shengf/deepseek/nemotron-container/pytorch-qwen_26.09-py3.sqsh"
 run_script = "/megatron/pretrain_gpt.py"
 
 # Distributed args
@@ -108,8 +108,8 @@ moe_router_force_load_balancing = "true"
 moe_router_topk = 8
 moe_grouped_gemm = "true"
 moe_aux_loss_coeff = 1e-3
-moe_token_dispatcher_type = "flex"
 
+moe_token_dispatcher_type = "flex"
 moe_flex_dispatcher_backend = "hybridep"
 moe_permute_fusion = "true"
 moe_router_dtype = "fp32"
@@ -176,8 +176,8 @@ PYTHONWARNINGS = "ignore"
 # NCCL_DEBUG = "INFO"
 # NCCL_DEBUG_SUBSYS = "ALL"
 
-# work around for symmetric user buffer bug
-NCCL_GIN_GPUNETIO_PATH = "/opt/hpcx/nccl_spectrum-x_plugin/lib/libdoca_gpunetio_host.so.2"
+# NCCL_NET_PLUGIN = "none"
+NCCL_TUNER_PLUGIN = "none"
 
 # SHARP_COLL_LOG_LEVEL = "0"
 # SHARP_COLL_SAT_LOCK_BATCH_SIZE = "1"
