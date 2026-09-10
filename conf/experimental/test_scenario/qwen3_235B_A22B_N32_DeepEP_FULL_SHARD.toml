@@ -4,4 +4,4 @@ name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 id = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 test_name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
 time_limit = "01:00:00"
-num_nodes = 16
+num_nodes = 32
