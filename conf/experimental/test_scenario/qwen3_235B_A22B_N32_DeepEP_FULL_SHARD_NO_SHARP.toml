@@ -1,0 +1,7 @@
+name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD_NO_SHARP"
+
+[[Tests]]
+id = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD_NO_SHARP"
+test_name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD_NO_SHARP"
+time_limit = "01:00:00"
+num_nodes = 32

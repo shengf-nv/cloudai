@@ -1,5 +1,5 @@
-name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
-description = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD"
+name = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD_NO_SHARP"
+description = "qwen3_235B_A22B_N32_DeepEP_FULLSHARD_NO_SHARP"
 test_template_name = "MegatronRun"
 
 
@@ -191,6 +191,6 @@ PYTHONWARNINGS = "ignore"
 NCCL_TUNER_PLUGIN = "none"
 
 # enable SHARP
-QWEN_ENABLE_SHARP = "1"
+QWEN_ENABLE_SHARP = "0"
 
 
